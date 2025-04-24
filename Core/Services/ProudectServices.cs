@@ -2,6 +2,7 @@
 using Domian.Contercts;
 using Domian.Models;
 using Services.Abstractions;
+using Services.Specifications;
 using Shared;
 using System;
 using System.Collections.Generic;
@@ -15,15 +16,22 @@ namespace Services
     {
         private readonly IUnitOfWork unitOfWork = unitOfWork;
 
-        public async Task<IEnumerable<ProudectResultDto>> GetAllProductsAsync()
+        public async Task<PaginationResponse<ProudectResultDto>> GetAllProductsAsync(ProductSpecificationsParamters SpecParams)
         {
-          var Proudect = await unitOfWork.GenericRepository<Proudect,int>().GetAllAsync();
+            var Spec =new ProductWithBrandsAndTypesSpecifications(SpecParams);
+
+
+            var specCount = new ProductWithCountSpecifications(SpecParams);
+            var countResult = await unitOfWork.GenericRepository<Proudect, int>().CountAsync(specCount);
+
+            var Proudect = await unitOfWork.GenericRepository<Proudect,int>().GetAllAsync(Spec);
             var Result = mapper.Map<IEnumerable<ProudectResultDto>>(Proudect);
-            return Result;
+            return new PaginationResponse<ProudectResultDto>(SpecParams.PageIndex,SpecParams.PageSize,0,Result);
         }
         public async Task<ProudectResultDto> GetProductByIdAsync(int id)
         {
-          var Proudect = await unitOfWork.GenericRepository<Proudect,int>().GetAsync(id);
+            var Spec = new ProductWithBrandsAndTypesSpecifications(id);
+            var Proudect = await unitOfWork.GenericRepository<Proudect,int>().GetAsync(Spec);
             if (Proudect is null) return null;
             
             var Result = mapper.Map<ProudectResultDto>(Proudect);

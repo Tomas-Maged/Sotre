@@ -1,6 +1,7 @@
 ﻿using Domian.Contercts;
 using Domian.Models;
 using Microsoft.EntityFrameworkCore;
+using Presentation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Persistence.Data.Repository
             if (typeof(TEntity) == typeof(Proudect))
             {
                 return trackChages ?
-                await _Context.Proudects.Include(p=>p.ProudectBrand).Include(p=>p.ProudectType).ToListAsync() as IEnumerable<TEntity>
+                await _Context.Proudects.Take(5).Include(p=>p.ProudectBrand).Include(p=>p.ProudectType).ToListAsync() as IEnumerable<TEntity>
                 : await _Context.Proudects.Include(p => p.ProudectBrand).Include(p => p.ProudectType).ToListAsync() as IEnumerable<TEntity>;
 
             }
@@ -41,7 +42,8 @@ namespace Persistence.Data.Repository
         {
             if (typeof(TEntity) == typeof(Proudect))
             {
-                return await _Context.Proudects.Include(p => p.ProudectBrand).Include(p => p.ProudectType).FirstOrDefaultAsync(p => p.Id.Equals(id)) as TEntity;
+                //return await _Context.Proudects.Include(p => p.ProudectBrand).Include(p => p.ProudectType).FirstOrDefaultAsync(p => p.Id.Equals(id)) as TEntity;
+                return await _Context.Proudects.Where(p => p.Id.Equals(id)).Include(p => p.ProudectBrand).Include(p => p.ProudectType).FirstOrDefaultAsync() as TEntity;
 
             }
             return await _Context.Set<TEntity>().FindAsync(id);
@@ -59,6 +61,24 @@ namespace Persistence.Data.Repository
         public void Delete(TEntity entity)
         {
             _Context.Remove(entity);
+        }
+
+        public async Task<IEnumerable<TEntity>> GetAllAsync(ISpecifications<TEntity, TKey> Spec, bool trackChages = false)
+        {
+            return await ApplySpecifications(Spec).ToListAsync();
+        }
+
+        public async Task<TEntity?> GetAsync(ISpecifications<TEntity, TKey> Spec)
+        {
+            return await ApplySpecifications(Spec).FirstOrDefaultAsync();
+        }
+        public async Task<int> CountAsync(ISpecifications<TEntity, TKey> Spec)
+        {
+            return await ApplySpecifications(Spec).CountAsync();
+        }
+        private IQueryable<TEntity> ApplySpecifications(ISpecifications<TEntity, TKey> spec)
+        {
+            return SpecificationEva1uator.GetQuery(_Context.Set<TEntity>(), spec);
         }
 
     }

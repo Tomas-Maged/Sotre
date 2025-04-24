@@ -1,0 +1,25 @@
+﻿using AutoMapper;
+using AutoMapper.Execution;
+using Domian.Models;
+using Microsoft.Extensions.Configuration;
+using Shared;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Services.MappingProfiles
+{
+   public class PictureUr1Resolver(IConfiguration configuration) : IValueResolver<Proudect, ProudectResultDto, string>
+    {
+        string IValueResolver<Proudect, ProudectResultDto, string>.Resolve(Proudect source, ProudectResultDto destination, string destMember, ResolutionContext context)
+        {
+            if (string.IsNullOrEmpty(source.PictureUrl))
+            {
+                return string.Empty;
+            }
+            return $"{configuration["BaseUrl"]}/{source.PictureUrl}";
+        }
+    }
+}
