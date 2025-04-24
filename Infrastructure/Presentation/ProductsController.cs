@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,11 @@ namespace Presentation
     [Route("api/[controller]")]
     public class ProductsController(IServicesManager servicesManager) : ControllerBase
     {
+
         [HttpGet]
-        public async Task<IActionResult> GetALlProducts()
+        public async Task<IActionResult> GetALlProducts([FromQuery]ProductSpecificationsParamters SpecParams)
         {
-            var products = await servicesManager.ProudectServices.GetAllProductsAsync();
+            var products = await servicesManager.ProudectServices.GetAllProductsAsync(SpecParams);
             if (products is null) return BadRequest(); //400
             return Ok(products); //200
         }
@@ -26,19 +28,17 @@ namespace Presentation
             if (product is null) return NotFound(); //404
             return Ok(product); //200
         }
-        [HttpGet]
-        [Route("GetProductByBrandId")]
-        public async Task<IActionResult> GetProductByBrandId(int brandId)
+        [HttpGet("brandes")]
+        public async Task<IActionResult> GetAllbrands(int brandId)
         {
-            var products = await servicesManager.ProudectServices.GetProductByIdAsync(brandId);
-            if (products is null) return NotFound(); //404
-            return Ok(products); //200
+            var brand= await servicesManager.ProudectServices.GetAllBrandessAsync();
+            if (brand is null) return NotFound(); //404
+            return Ok(brand); //200
         }
-        [HttpGet]
-        [Route("GetProductByTypeId")]
-        public async Task<IActionResult> GetProductByTypeId(int typeId)
+        [HttpGet("brands")]
+        public async Task<IActionResult> GetAllTypes(int typeId)
         {
-            var products = await servicesManager.ProudectServices.GetProductByIdAsync(typeId);
+            var products = await servicesManager.ProudectServices.GetAllTypesAsync();
             if (products is null) return NotFound(); //404
             return Ok(products); //200
         }

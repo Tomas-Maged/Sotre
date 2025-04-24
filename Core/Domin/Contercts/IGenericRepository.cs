@@ -9,8 +9,11 @@ namespace Domian.Contercts
 {
    public interface IGenericRepository <TEntitey , TKey> where TEntitey : BaseEntity<TKey>
     {
+        Task<int> CountAsync(ISpecifications<TEntitey, TKey> Spec);
         Task<IEnumerable<TEntitey>> GetAllAsync(bool trackChages = false);
-        Task<TEntitey?> GetAsync(TKey id);
+        Task<IEnumerable<TEntitey>> GetAllAsync(ISpecifications<TEntitey,TKey> Spec, bool trackChages = false);
+        Task<TEntitey?> GetAsync(TKey id); 
+        Task<TEntitey?> GetAsync(ISpecifications<TEntitey, TKey> Spec); 
         Task AddAsync(TEntitey entity);
         void Update(TEntitey entity);
         void Delete(TEntitey entity);
