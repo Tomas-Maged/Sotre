@@ -1,10 +1,15 @@
 using Domian.Contercts;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Persistence.Data;
 using Persistence.Data.Repository;
 using Services;
 using Services.Abstractions;
+using Shared.ErrorsModeLs;
+using Sotre.Extensions;
+using Sotre.Middlewares;
 using System.Threading.Tasks;
 
 namespace Sotre
@@ -17,40 +22,11 @@ namespace Sotre
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-            builder.Services.AddDbContext<StoreDBContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
+            builder.Services.ReisterA11Services(builder.Configuration);
 
-            builder.Services.AddScoped<IDbInitializer, DbInitializer>();
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddScoped<IServicesManager, ServicesManager> ();
-            ;            builder.Services.AddAutoMapper(typeof(Services.AssemblyReference).Assembly);
             var app = builder.Build();
 
-           using var scope = app.Services.CreateScope();
-            var DbIInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-           await DbIInitializer.InitializeAsync();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            app.UseStaticFiles();
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
+            await app.Configuremiddlewares();
             app.Run();
         }
     }

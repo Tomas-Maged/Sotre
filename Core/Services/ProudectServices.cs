@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domian.Contercts;
+using Domian.Exceptions;
 using Domian.Models;
 using Services.Abstractions;
 using Services.Specifications;
@@ -32,7 +33,7 @@ namespace Services
         {
             var Spec = new ProductWithBrandsAndTypesSpecifications(id);
             var Proudect = await unitOfWork.GenericRepository<Proudect,int>().GetAsync(Spec);
-            if (Proudect is null) return null;
+            if (Proudect is null) throw new ProductNotFoundExceptions(id);
             
             var Result = mapper.Map<ProudectResultDto>(Proudect);
             return Result;
