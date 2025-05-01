@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domian.Contercts
 {
-   public interface IDbInitializer
+    public interface ICacheRepsitory
     {
-        Task InitializeAsync();
-        Task InitializeIdentityAsync();
+        Task SetAsync(string key, object value, TimeSpan Duration);
+        Task<string?> GetAsync(string key);
     }
 }

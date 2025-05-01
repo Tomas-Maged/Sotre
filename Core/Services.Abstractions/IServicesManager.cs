@@ -9,6 +9,8 @@ namespace Services.Abstractions
    public interface IServicesManager
     {
         IProudectServices ProudectServices { get; }
+        ICacheService CacheService { get; }
         IBasketservice Basketservice { get; }
+        IAuthService AuthService { get; }
     }
 }
