@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
+using Persistence.Identity;
 
 namespace Persistence
 {
@@ -21,9 +22,13 @@ namespace Persistence
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
-           services.AddScoped<IDbInitializer, DbInitializer>();
+
+            services.AddDbContext<StoreIdentityDbContext>(options => 
+                options.UseSqlServer(configuration.GetConnectionString("IdentyConnection")));
+            services.AddScoped<IDbInitializer, DbInitializer>();
            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IBasketRepository, BasketRepository>();
+            services.AddScoped<ICacheRepsitory, CacheRepositor>();
             services.AddSingleton<IConnectionMultiplexer>((ServiceProvider) => 
             {
                 return ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")!);

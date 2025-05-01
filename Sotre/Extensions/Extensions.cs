@@ -1,6 +1,9 @@
 ﻿using Domian.Contercts;
+using Domian.Models.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Persistence;
+using Persistence.Identity;
 using Services;
 using Shared.ErrorsModeLs;
 using Sotre.Middlewares;
@@ -23,6 +26,7 @@ namespace Sotre.Extensions
             services.AddApplicationServices();
 
             services.Configureservice();
+            services.AddIdentityService();
 
             return services;
         }
@@ -40,6 +44,13 @@ namespace Sotre.Extensions
 
             return services;
         }
+        private static IServiceCollection AddIdentityService(this IServiceCollection services)
+        {
+            services.AddIdentity<AppUser, IdentityRole>()
+                .AddEntityFrameworkStores<StoreIdentityDbContext>();
+            return services;
+        }
+
 
         private static IServiceCollection Configureservice(this IServiceCollection services)
         {
@@ -96,6 +107,7 @@ namespace Sotre.Extensions
             using var scope = app.Services.CreateScope();
             var DbIInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
             await DbIInitializer.InitializeAsync();
+            await DbIInitializer.InitializeIdentityAsync();
 
             return app;
 

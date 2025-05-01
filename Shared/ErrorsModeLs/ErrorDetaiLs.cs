@@ -10,5 +10,6 @@ namespace Shared.ErrorsModeLs
     {
         public int StadusCode { get; set; }
         public string ErrorMessage { get; set; }
+        public IEnumerable<string>? Errors { get; set; }
     }
 }
