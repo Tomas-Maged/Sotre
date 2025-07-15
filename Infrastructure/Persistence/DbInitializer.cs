@@ -1,6 +1,7 @@
 ﻿using Domian.Contercts;
 using Domian.Models;
 using Domian.Models.Identity;
+using Domian.Models.OrderModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
@@ -62,6 +63,7 @@ namespace Persistence
                     await _Context.SaveChangesAsync();
                 }
             }
+
             if (!_Context.Proudects.Any())
             {
                 var FilePath = await File.ReadAllTextAsync(@"../Infrastructure\Persistence\Seeding\products.json");
@@ -69,6 +71,16 @@ namespace Persistence
                 if (products != null && products.Any())
                 {
                     await _Context.Proudects.AddRangeAsync(products);
+                    await _Context.SaveChangesAsync();
+                }
+            }
+            if (!_Context.DeliveryMethods.Any())
+            {
+                var DeliveryMethod = await File.ReadAllTextAsync(@"../Infrastructure\Persistence\Seeding\delivery.json");
+                var Delivery = JsonSerializer.Deserialize<List<DeliveryMethod>>(DeliveryMethod);
+                if (Delivery != null && Delivery.Any())
+                {
+                    await _Context.DeliveryMethods.AddRangeAsync(Delivery);
                     await _Context.SaveChangesAsync();
                 }
             }

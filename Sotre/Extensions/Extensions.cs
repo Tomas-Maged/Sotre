@@ -1,12 +1,17 @@
 ﻿using Domian.Contercts;
 using Domian.Models.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using Persistence.Identity;
 using Services;
+using Shared;
 using Shared.ErrorsModeLs;
 using Sotre.Middlewares;
+using System.Text;
 
 namespace Sotre.Extensions
 {
@@ -23,11 +28,10 @@ namespace Sotre.Extensions
 
             services.AddInfrastructureServices(configuration);
 
-            services.AddApplicationServices();
-
+            services.AddApplicationServices(configuration);
             services.Configureservice();
             services.AddIdentityService();
-
+            services.ConfagerJwtService(configuration);
             return services;
         }
 
@@ -37,6 +41,31 @@ namespace Sotre.Extensions
 
             return services;
         } 
+        private static IServiceCollection ConfagerJwtService(this IServiceCollection services , IConfiguration configuration)
+        {
+            var JwtOptions = configuration.GetSection("JWtoptions").Get<Jwtoption>();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options => {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = JwtOptions.issuer,
+                    ValidAudience = JwtOptions.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtOptions.SecuretyKey)),
+
+                };
+            });
+            return services;
+
+        }
+
         private static IServiceCollection Addswaggerservices(this IServiceCollection services)
         {
             services.AddEndpointsApiExplorer();
